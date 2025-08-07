@@ -1,0 +1,74 @@
+<div class="auth-card card card-glass p-4 p-md-5 shadow-lg animate-fadeInUp" style="max-width: 430px; width: 100%;">
+  <div class="text-center mb-4">
+    <img src="/favicon.ico" alt="avatar" class="rounded-circle shadow mb-2" width="64"
+      height="64">
+    <h2 class="fw-bold mb-1" style="font-size:1.35rem;">Profilim</h2>
+    <p class="text-muted mb-0" style="font-size:1rem;">Kullanıcı bilgilerinizi görüntüleyin ve güncelleyin.</p>
+  </div>
+  <form method="POST" action="/auth/profile/update-info">
+    <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+    <div class="mb-3">
+      <label for="name" class="form-label">Ad Soyad</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ .User.Name }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">E-posta</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ .User.Email }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 fw-semibold py-2 mt-2 mb-3">Bilgileri Güncelle</button>
+  </form>
+  <form method="POST" action="/auth/profile/update-password">
+    <input type="hidden" name="csrf_token" value="{{ .CsrfToken }}">
+    <div class="mb-3">
+      <label for="current_password" class="form-label">Mevcut Şifre</label>
+      <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Mevcut şifrenizi girin" required>
+    </div>
+    <div class="mb-3">
+      <label for="new_password" class="form-label">Yeni Şifre (İsteğe Bağlı)</label>
+      <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Yeni şifre belirleyin">
+    </div>
+    <div class="mb-3">
+      <label for="confirm_password" class="form-label">Yeni Şifre (Tekrar)</label>
+      <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Yeni şifreyi tekrar yazın">
+      <div id="password-match-feedback" class="form-text text-danger d-none">Şifreler aynı olmalı.</div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 fw-semibold py-2 mt-2" id="update-btn" disabled>Şifreyi Güncelle</button>
+  </form>
+  <div class="d-flex justify-content-between mt-3" style="font-size:0.97rem;">
+    {{ if eq .User.Type "dashboard" }}
+      <a href="/dashboard/home" class="fw-semibold">Geri Dön</a>
+    {{ else if eq .User.Type "panel" }}
+      <a href="/panel/home" class="fw-semibold">Geri Dön</a>
+    {{ else }}
+      <a href="/auth/login" class="fw-semibold">Geri Dön</a>
+    {{ end }}
+    <a href="/auth/logout" class="fw-semibold">Çıkış Yap</a>
+  </div>
+</div>
+<script>
+  const passwordInput = document.getElementById('new_password');
+  const passwordConfirmInput = document.getElementById('confirm_password');
+  const updateBtn = document.getElementById('update-btn');
+  const feedback = document.getElementById('password-match-feedback');
+
+  function checkPasswords() {
+    const pass = passwordInput.value;
+    const pass2 = passwordConfirmInput.value;
+    if (pass.length === 0 && pass2.length === 0) {
+      feedback.classList.add('d-none');
+      updateBtn.disabled = false;
+      return;
+    }
+    if (pass === pass2 && pass.length > 0) {
+      feedback.classList.add('d-none');
+      updateBtn.disabled = false;
+    } else {
+      feedback.classList.remove('d-none');
+      updateBtn.disabled = true;
+    }
+  }
+  passwordInput.addEventListener('input', checkPasswords);
+  passwordConfirmInput.addEventListener('input', checkPasswords);
+  // İlk yüklemede kontrol
+  checkPasswords();
+</script>
